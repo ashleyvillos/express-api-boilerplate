@@ -1,32 +1,39 @@
 const express = require('express')
 const ProductRouter = express.Router()
 const ProductController = require('../controllers/product.controller')
+const AuthService = require('../services/auth.service')
 
-ProductRouter.get('/product', async (req, res) => {
-    let response = await ProductController.getAllProducts()
-    return res.status(200).send({response})
+// get products by store
+ProductRouter.get('/products-by-store-id', async (req, res) => {
+    let authenticate = await AuthService.verify(req.headers['authorization'].split(' ')[1])
+    if (authenticate.status == 200) {
+        let response = await ProductController.getAllProductsByStoreId()
+        return res.status(response.status).send({response})
+    } else {
+        return res.status(authenticate.status).send(authenticate)
+    }
 })
 
-ProductRouter.get('/product/:id', async (req, res) => {
-    let response = await ProductController.getOneProduct(parseInt(req.params.id))
-    return res.status(200).send({response})
+// get store information per product
+ProductRouter.get('/store-by-product/:id', async (req, res) => {
+    let authenticate = await AuthService.verify(req.headers['authorization'].split(' ')[1])
+    if (authenticate.status == 200) {
+        let response = await ProductController.getProductIdWithStoreInfo(parseInt(req.params.id))
+        return res.status(response.status).send({response})
+    } else {
+        return res.status(authenticate.status).send(authenticate)
+    }
 })
 
-ProductRouter.post('/product', async (req, res) => {
-    let response = await ProductController.addProduct(req.body)
-    return res.status(200).send(response)
-})
-
-ProductRouter.put('/product/:id', async (req, res) => {
-    let productId = req.params.id
-    let requestObject = req.body
-    let response = await ProductController.updateProduct(parseInt(productId), requestObject)
-    return res.status(200).send(response)
-})
-
-ProductRouter.delete('/product/:id', async (req, res) => {
-    let response = await ProductController.deleteProduct(parseInt(req.params.id))
-    return res.status(200).send(response)
+// get store information per product
+ProductRouter.get('/get-all-products', async (req, res) => {
+    let authenticate = await AuthService.verify(req.headers['authorization'].split(' ')[1])
+    if (authenticate.status == 200) {
+        let response = await ProductController.getAllProducts(req.query)
+        return res.status(response.status).send({response})
+    } else {
+        return res.status(authenticate.status).send(authenticate)
+    }
 })
 
 module.exports = ProductRouter

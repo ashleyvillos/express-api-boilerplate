@@ -1,24 +1,23 @@
 const ProductService = require('../services/product.service')
 
 class ProductController {
-    async getAllProducts() {
-        return await ProductService.getAllProducts()
+    async getAllProductsByStoreId() {
+        let response = await ProductService.getAllProductsByStoreId()
+        return response
     }
 
-    async getOneProduct(productId) {
-        return await ProductService.getOneProduct(productId)
+    async getProductIdWithStoreInfo(productId) {
+        let response = await ProductService.getProductIdWithStoreInfo(productId)
+        return response
     }
 
-    async addProduct(requestObject) {
-        return await ProductService.addProduct(requestObject)
-    }
-
-    async updateProduct(productId, requestObject) {
-        return await ProductService.updateProduct(productId, requestObject)
-    }
-
-    async deleteProduct(productId) {
-        return await ProductService.deleteProduct(productId)
+    async getAllProducts(requestObject) {
+        let offset = ('offset' in requestObject && requestObject.offset) ? parseInt(requestObject.offset) : 0
+        let limit = ('limit' in requestObject && requestObject.limit) ? parseInt(requestObject.limit) : 5
+        let sort = ('sort' in requestObject && requestObject.sort) ? requestObject.sort : 'id'
+        let order = ('order' in requestObject && requestObject.order) ? requestObject.order : 'ASC'
+        let response = await ProductService.getAllProducts(offset, limit, sort, order)
+        return response
     }
 }
 
